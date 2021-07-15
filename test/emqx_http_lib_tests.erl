@@ -92,3 +92,9 @@ normalise_headers_test() ->
     ?assertEqual([{"content-type", "applicaiton/binary"}],
                  emqx_http_lib:normalise_headers([{"Content_Type", "applicaiton/binary"},
                                                   {"content-type", "applicaiton/json"}])).
+
+typerefl_test() ->
+    {ok, URI1} = emqx_http_lib:uri_parse("HTTPS://127.0.0.1"),
+    ?assertMatch(ok, typerefl:typecheck(emqx_http_lib:uri_map(), URI1)),
+    {ok, URI2} = emqx_http_lib:uri_parse("HTTPS://localhost"),
+    ?assertMatch(ok, typerefl:typecheck(emqx_http_lib:uri_map(), URI2)).
