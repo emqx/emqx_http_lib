@@ -22,10 +22,12 @@
         , normalise_headers/1
         ]).
 
--export_type([uri_map/0]).
+-include_lib("typerefl/include/types.hrl").
+
+-reflect_type([uri_map/0, uri/0]).
 
 -type uri_map() :: #{scheme := http | https,
-                     host := unicode:chardata(),
+                     host := unicode:chardata() | inet:ip_address(),
                      port := non_neg_integer(),
                      path => unicode:chardata(),
                      query => unicode:chardata(),
