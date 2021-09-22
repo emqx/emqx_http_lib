@@ -19,6 +19,7 @@
 -export([ uri_encode/1
         , uri_decode/1
         , uri_parse/1
+        , uri_map_to_string/1
         , normalise_headers/1
         ]).
 
@@ -26,7 +27,7 @@
 
 -reflect_type([uri_map/0, uri/0]).
 
--type uri_map() :: #{scheme := http | https,
+-type uri_map() :: #{scheme := http | https | coap | coaps,
                      host := unicode:chardata() | inet:ip_address(),
                      port := non_neg_integer(),
                      path => unicode:chardata(),
@@ -93,6 +94,17 @@ do_parse(URI) ->
             Map2 = uri_string:parse(unicode:characters_to_list(["http://", URI])),
             normalise_parse_result(Map2)
     end.
+
+-spec uri_map_to_string(uri_map()) -> string().
+uri_map_to_string(#{ scheme := Scheme
+                   , host := Host
+                   } = UriMap) when is_atom(Scheme) ->
+    uri_string:normalize(UriMap#{scheme => atom_to_list(Scheme),
+                                 host => case inet:ntoa(Host) of
+                                             {error, einval} -> Host;
+                                             Address -> Address
+                                         end
+                                }).
 
 %% @doc Return HTTP headers list with keys lower-cased and
 %% underscores replaced with hyphens
