@@ -88,10 +88,10 @@ uri_parse_test_() ->
       }
     ].
 
-uri_map_to_string_test_() ->
+normalize_test_() ->
     [ {"http",
        fun() -> ?assertEqual("http://localhost/",
-                             emqx_http_lib:uri_map_to_string(#{host => "localhost",
+                             emqx_http_lib:normalize(#{host => "localhost",
                                                                path => [],
                                                                port => 80,
                                                                scheme => http}))
@@ -99,7 +99,7 @@ uri_map_to_string_test_() ->
       }
     , {"https",
        fun() -> ?assertEqual("https://localhost/",
-                             emqx_http_lib:uri_map_to_string(#{host => "localhost",
+                             emqx_http_lib:normalize(#{host => "localhost",
                                                                path => "/",
                                                                port => 443,
                                                                scheme => https}))
@@ -107,7 +107,7 @@ uri_map_to_string_test_() ->
       }
     , {"ip address",
        fun() -> ?assertEqual("http://127.0.0.1/",
-                            emqx_http_lib:uri_map_to_string(#{scheme => http,
+                            emqx_http_lib:normalize(#{scheme => http,
                                                               path => [],
                                                               host => {127, 0, 0, 1},
                                                               port => 80}))
@@ -115,7 +115,7 @@ uri_map_to_string_test_() ->
       }
     , {"path",
        fun() -> ?assertEqual("http://localhost/test",
-                             emqx_http_lib:uri_map_to_string(#{host => "localhost",
+                             emqx_http_lib:normalize(#{host => "localhost",
                                                                path => "/test",
                                                                port => 80,
                                                                scheme => http}))
@@ -123,7 +123,7 @@ uri_map_to_string_test_() ->
       }
     , {"query",
        fun() -> ?assertEqual("http://localhost/?foo=bar",
-                             emqx_http_lib:uri_map_to_string(#{host => "localhost",
+                             emqx_http_lib:normalize(#{host => "localhost",
                                                                path => [],
                                                                port => 80,
                                                                query => "foo=bar",
@@ -132,7 +132,7 @@ uri_map_to_string_test_() ->
       }
     , {"userinfo",
        fun() -> ?assertEqual("http://user@localhost/",
-                             emqx_http_lib:uri_map_to_string(#{host => "localhost",
+                             emqx_http_lib:normalize(#{host => "localhost",
                                                                path => [],
                                                                port => 80,
                                                                userinfo => "user",
@@ -141,7 +141,7 @@ uri_map_to_string_test_() ->
       }
     , {"fragment",
        fun() -> ?assertEqual("http://localhost/#foo",
-                             emqx_http_lib:uri_map_to_string(#{host => "localhost",
+                             emqx_http_lib:normalize(#{host => "localhost",
                                                                path => [],
                                                                port => 80,
                                                                fragment => "foo",

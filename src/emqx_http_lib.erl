@@ -19,7 +19,7 @@
 -export([ uri_encode/1
         , uri_decode/1
         , uri_parse/1
-        , uri_map_to_string/1
+        , normalize/1
         , normalise_headers/1
         ]).
 
@@ -95,10 +95,10 @@ do_parse(URI) ->
             normalise_parse_result(Map2)
     end.
 
--spec uri_map_to_string(uri_map()) -> string().
-uri_map_to_string(#{ scheme := Scheme
-                   , host := Host
-                   } = UriMap) when is_atom(Scheme) ->
+-spec normalize(uri_map()) -> string().
+normalize(#{ scheme := Scheme
+           , host := Host
+           } = UriMap) when is_atom(Scheme) ->
     uri_string:normalize(UriMap#{scheme => atom_to_list(Scheme),
                                  host => case inet:ntoa(Host) of
                                              {error, einval} -> Host;
