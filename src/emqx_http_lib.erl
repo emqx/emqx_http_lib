@@ -124,11 +124,12 @@ normalise_headers(Headers0) ->
 normalise_parse_result(#{host := Host, scheme := Scheme0} = Map) ->
     {Scheme, DefaultPort} = atom_scheme_and_default_port(Scheme0),
     Port = case maps:get(port, Map, undefined) of
-               N when is_number(N) -> N;
-               _ -> DefaultPort
+               N when is_integer(N), N >= 0, N =< 65536 -> N;
+               undefined -> DefaultPort;
+               N -> erlang:throw({invalid_port, N})
            end,
     Map#{ scheme := Scheme
-        , host := maybe_parse_ip(Host)
+        , host := assert_not_empty_host(maybe_parse_ip(Host))
         , port => Port
         }.
 
@@ -194,3 +195,9 @@ integer_to_hexlist(Int) ->
 hex2dec(X) when (X>=$0) andalso (X=<$9) -> X-$0;
 hex2dec(X) when (X>=$A) andalso (X=<$F) -> X-$A+10;
 hex2dec(X) when (X>=$a) andalso (X=<$f) -> X-$a+10.
+
+%% -----------------------------------------------------------------------------
+assert_not_empty_host(Host) when Host =:= <<>>; Host =:= "" ->
+    erlang:throw(empty_host_not_allowed);
+assert_not_empty_host(Host) ->
+    Host.

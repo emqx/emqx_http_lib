@@ -61,6 +61,16 @@ uri_parse_test_() ->
                              emqx_http_lib:uri_parse("https://localhost:notnumber"))
        end
       }
+    , {"bad url2",
+       fun() -> ?assertMatch({error, empty_host_not_allowed},
+                             emqx_http_lib:uri_parse("https://"))
+       end
+      }
+    , {"bad url3",
+       fun() -> ?assertMatch({error, {invalid_port, 65537}},
+                             emqx_http_lib:uri_parse("https://a:65537"))
+       end
+      }
     , {"normalise",
        fun() -> ?assertMatch({ok, #{scheme := https, host := {127, 0, 0, 1}}},
                              emqx_http_lib:uri_parse("HTTPS://127.0.0.1"))
