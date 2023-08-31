@@ -1,6 +1,6 @@
 {application, emqx_http_lib,
  [{description, "EMQX HTTP Library"},
-  {vsn, "0.5.2"},
+  {vsn, "0.5.3"},
   {registered, []},
   {applications,
    [kernel,
