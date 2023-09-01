@@ -76,7 +76,9 @@ uri_encode(URI) when is_binary(URI) ->
 -spec uri_parse(string() | binary()) -> {ok, uri_map()} | {error, any()}.
 uri_parse(URI) ->
     try
-        {ok, do_parse(uri_string:normalize(URI))}
+        %% ensure we return string() instead of binary() in uri_map() values.
+        URI1 = maybe_add_default_scheme(unicode:characters_to_list(URI)),
+        {ok, do_parse(uri_string:normalize(URI1))}
     catch
         throw : Reason ->
             {error, Reason}
@@ -84,15 +86,14 @@ uri_parse(URI) ->
 
 do_parse({error, Reason, Which}) -> throw({Reason, Which});
 do_parse(URI) ->
-    %% ensure we return string() instead of binary() in uri_map() values.
-    Map = uri_string:parse(unicode:characters_to_list(URI)),
-    case maps:is_key(scheme, Map) of
-        true ->
-            normalise_parse_result(Map);
-        false ->
-            %% missing scheme, add "http://" and try again
-            Map2 = uri_string:parse(unicode:characters_to_list(["http://", URI])),
-            normalise_parse_result(Map2)
+    normalise_parse_result(uri_string:parse(URI)).
+
+maybe_add_default_scheme(URI) ->
+    case string:split(URI, "://", leading) of
+        [_Schema, _Rem] ->
+            URI;
+        _ ->
+            "http://" ++ URI
     end.
 
 -spec normalize(uri_map()) -> string().

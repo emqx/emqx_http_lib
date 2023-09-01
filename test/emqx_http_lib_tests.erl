@@ -96,6 +96,16 @@ uri_parse_test_() ->
                              emqx_http_lib:uri_parse("http://[::1]:80"))
        end
       }
+    , {"host and port without scheme",
+       fun() -> ?assertMatch({ok, #{scheme := http, host := "localhost"}},
+                             emqx_http_lib:uri_parse(<<"localhost:3000">>))
+       end
+      }
+    , {"ipv4 address and port without scheme",
+       fun() -> ?assertMatch({ok, #{scheme := http, host := {127, 0, 0, 1}}},
+                             emqx_http_lib:uri_parse("127.0.0.1:3000"))
+       end
+      }
     ].
 
 normalize_test_() ->
